@@ -1,21 +1,22 @@
 # sticksniffer
 
-A command-line USB device sniffer for Linux, built in C on top of `libusb-1.0`. The goal is a lightweight CLI tool you can run  that lists and inspects USB devices connected to your machine.
+A command-line USB device dashboard/sniffer for Linux, built in C on top of `libusb-1.0`. The goal is a lightweight CLI tool you can run like `git` or `htop` that lists and inspects USB devices connected to your machine.
 
 ## Purpose
 
-`sticksniffer` initializes a `libusb` context and talks directly to the USB subsystem to enumerate connected devices with terminal output. Longer term it's meant to grow into a proper dashboard: listing devices, showing vendor/product IDs, and eventually watching for connect/disconnect events in real time.
+`sticksniffer` initializes a `libusb` context and talks directly to the USB subsystem to enumerate connected devices — no GUI, no browser, just terminal output. Longer term it's meant to grow into a proper dashboard: listing devices, showing vendor/product IDs, and eventually watching for connect/disconnect events in real time.
 
 ## Current State (Work in Progress)
 
 This project is early-stage. Right now:
 
-- `libusb` context initializes correctly
-- Clean init/exit lifecycle (`libusb_init` → `libusb_exit`)
-- **Not yet implemented:** actual device enumeration (`libusb_get_device_list`) — this is the next step
-- **Not yet implemented:** packaging (Makefile install target / `.deb`)
-- **Not yet implemented:** live device watching / dashboard view
+-  `libusb` context initializes correctly
+-  Clean init/exit lifecycle (`libusb_init` → `libusb_exit`)
+-  **Not yet implemented:** actual device enumeration (`libusb_get_device_list`) — this is the next step
+-  **Not yet implemented:** packaging (Makefile install target / `.deb`)
+-  **Not yet implemented:** live device watching / dashboard view
 
+In other words: the binary currently proves libusb is wired up correctly, but doesn't list or inspect any devices yet.
 
 ## Requirements
 
@@ -45,14 +46,40 @@ Then confirm the device is visible inside WSL2 with `lsusb`.
 
 ## Build & Run
 
-Currently there's no Makefile yet — build directly with `gcc` and `pkg-config`:
+### Build only (run from the project directory)
 
 ```bash
-gcc sticksniffer.c -o sticksniffer $(pkg-config --cflags --libs libusb-1.0)
+make
 ./sticksniffer
 ```
 
-Expected output:
+### Build and install system-wide (adds it to your PATH)
+
+```bash
+make
+sudo make install
+sticksniffer        # now runs from anywhere
+```
+
+### Uninstall
+
+```bash
+sudo make uninstall
+```
+
+### Clean build artifacts
+
+```bash
+make clean
+```
+
+By default `make install` puts the binary in `/usr/local/bin`. To install elsewhere:
+
+```bash
+sudo make install PREFIX=/opt/sticksniffer
+```
+
+Expected output (for now):
 
 ```
 libusb initialized successfully!
@@ -63,7 +90,7 @@ libusb initialized successfully!
 ## Roadmap
 
 1. Add `libusb_get_device_list()` to enumerate and print connected USB devices (VID/PID, device class, etc.)
-2. Add a `Makefile` with `install` / `uninstall` targets so it can be run as `sticksniffer` from anywhere on `PATH`
+2. ~~Add a `Makefile` with `install` / `uninstall` targets~~  done
 3. Package as a `.deb` with `libusb-1.0-0` declared as a runtime dependency
 4. Add live device connect/disconnect monitoring
 
